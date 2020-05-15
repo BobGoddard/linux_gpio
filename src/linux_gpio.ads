@@ -5,13 +5,13 @@ with Ada.Strings.Unbounded;
 package Linux_GPIO is
 
    subtype GPIO_REQUEST_EDGE_TYPE is Interfaces.Unsigned_32 range 1 .. 3;
-   GPIOEVENT_REQUEST_RISING_EDGE  : constant Interfaces.Unsigned_32 := Shift_Left (1, 0);
-   GPIOEVENT_REQUEST_FALLING_EDGE : constant Interfaces.Unsigned_32 := Shift_Left (1, 1);
-   GPIOEVENT_REQUEST_BOTH_EDGES   : constant Interfaces.Unsigned_32 := GPIOEVENT_REQUEST_RISING_EDGE + GPIOEVENT_REQUEST_FALLING_EDGE;
+   GPIOEVENT_REQUEST_RISING_EDGE  : constant GPIO_REQUEST_EDGE_TYPE := Shift_Left (1, 0);
+   GPIOEVENT_REQUEST_FALLING_EDGE : constant GPIO_REQUEST_EDGE_TYPE := Shift_Left (1, 1);
+   GPIOEVENT_REQUEST_BOTH_EDGES   : constant GPIO_REQUEST_EDGE_TYPE := GPIOEVENT_REQUEST_RISING_EDGE + GPIOEVENT_REQUEST_FALLING_EDGE;
 
    subtype GPIO_EVENT_EDGE_TYPE is Interfaces.Unsigned_32 range 1 .. 2;
-   GPIOEVENT_EVENT_RISING_EDGE    : constant Interfaces.Unsigned_32 := Shift_Left (1, 0);
-   GPIOEVENT_EVENT_FALLING_EDGE   : constant Interfaces.Unsigned_32 := Shift_Left (1, 1);
+   GPIOEVENT_EVENT_RISING_EDGE    : constant GPIO_EVENT_EDGE_TYPE := Shift_Left (1, 0);
+   GPIOEVENT_EVENT_FALLING_EDGE   : constant GPIO_EVENT_EDGE_TYPE := Shift_Left (1, 1);
 
    GPIOLINE_FLAG_KERNEL           : constant Interfaces.Unsigned_32 := Shift_Left (1, 0);
    GPIOLINE_FLAG_IS_OUT           : constant Interfaces.Unsigned_32 := Shift_Left (1, 1);
