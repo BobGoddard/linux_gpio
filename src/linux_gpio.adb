@@ -126,7 +126,7 @@ package body Linux_GPIO is
       end if;
 
       if Ada.Strings.Unbounded.Length (Consumer_Label) < 31 then
-         Request.consumer_label := Interfaces.C.To_C (Ada.Strings.Unbounded.To_String (Consumer_Label) & Blanks_32 ((Ada.Strings.Unbounded.Length (Consumer_Label) + 2) .. Blanks_32'Length));
+         Request.consumer_label := Interfaces.C.To_C (Ada.Strings.Unbounded.To_String (Consumer_Label) & Ada.Characters.Latin_1.NUL & Blanks_32 ((Ada.Strings.Unbounded.Length (Consumer_Label) + 2) .. Blanks_32'Length));
       else
          Request.consumer_label := Interfaces.C.To_C (Ada.Strings.Unbounded.To_String (Consumer_Label));
       end if;
