@@ -1,5 +1,6 @@
 with Ada.Characters.Latin_1;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+with Ada.Text_IO;
 with GNAT.OS_Lib;
 with GNAT.Source_Info;
 with Interfaces.C; use Interfaces.C;
@@ -118,11 +119,13 @@ package body Linux_GPIO is
       Request.lineoffsets    := Lines;
       Request.lines          := NLines;
 
-      if Ada.Strings.Unbounded.Length (Consumer_Label) > 32 then
+      Ada.Text_IO.Put_Line ("label length: " & Ada.Strings.Unbounded.Length (Consumer_Label)'Image);
+
+      if Ada.Strings.Unbounded.Length (Consumer_Label) > 31 then
          raise label_exception;
       end if;
 
-      if Ada.Strings.Unbounded.Length (Consumer_Label) < 32 then
+      if Ada.Strings.Unbounded.Length (Consumer_Label) < 31 then
          Request.consumer_label := Interfaces.C.To_C (Ada.Strings.Unbounded.To_String (Consumer_Label) & Blanks_32 ((Ada.Strings.Unbounded.Length (Consumer_Label) + 2) .. Blanks_32'Length));
       else
          Request.consumer_label := Interfaces.C.To_C (Ada.Strings.Unbounded.To_String (Consumer_Label));
