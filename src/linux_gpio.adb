@@ -118,7 +118,7 @@ package body Linux_GPIO is
       Request.lineoffsets    := Lines;
       Request.lines          := NLines;
 
-      if Ada.Strings.Unbounded.Length (Consumer_Label) > 31 then
+      if Ada.Strings.Unbounded.Length (Consumer_Label) > 32 then
          raise label_exception;
       end if;
 
