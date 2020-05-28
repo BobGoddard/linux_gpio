@@ -13,6 +13,7 @@ package Linux_GPIO is
    GPIOEVENT_EVENT_RISING_EDGE    : constant GPIO_EVENT_EDGE_TYPE := Shift_Left (1, 0);
    GPIOEVENT_EVENT_FALLING_EDGE   : constant GPIO_EVENT_EDGE_TYPE := Shift_Left (1, 1);
 
+   GPIOLINE_FLAG_NONE             : constant Interfaces.Unsigned_32 := 0;
    GPIOLINE_FLAG_KERNEL           : constant Interfaces.Unsigned_32 := Shift_Left (1, 0);
    GPIOLINE_FLAG_IS_OUT           : constant Interfaces.Unsigned_32 := Shift_Left (1, 1);
    GPIOLINE_FLAG_ACTIVE_LOW       : constant Interfaces.Unsigned_32 := Shift_Left (1, 2);
@@ -57,20 +58,20 @@ package Linux_GPIO is
    end record;
    pragma Convention (C_Pass_By_Copy, gpioline_info);
 
+   type gpiohandle_data is record
+      values : aliased values_array;
+   end record;
+   pragma Convention (C_Pass_By_Copy, gpiohandle_data);
+
    type gpiohandle_request is record
       lineoffsets    : lineoffsets_array;
       flags          : flags_type;
-      default_values : values_array;
+      default_values : gpiohandle_data;
       consumer_label : consumer_type;
       lines          : lines_type;
       fd             : fd_type;
    end record;
    pragma Convention (C_Pass_By_Copy, gpiohandle_request);
-
-   type gpiohandle_data is record
-      values : aliased values_array;
-   end record;
-   pragma Convention (C_Pass_By_Copy, gpiohandle_data);
 
    type gpioevent_request is record
       lineoffset     :  pin_nums;
@@ -92,18 +93,53 @@ package Linux_GPIO is
       mask : mask_type;
    end record;
 
-   type gpio_flag_type is array (Interfaces.Unsigned_32 range 0 .. 4) of gpio_flag_record;
+   type gpio_flag_type is array (Interfaces.Unsigned_32 range 0 .. 5) of gpio_flag_record;
 
-   gpio_flag : constant gpio_flag_type := ((Ada.Strings.Unbounded.To_Unbounded_String ("kernel"),      GPIOLINE_FLAG_KERNEL),
-                                           (Ada.Strings.Unbounded.To_Unbounded_String ("output"),      GPIOLINE_FLAG_IS_OUT),
+   gpio_flag : constant gpio_flag_type := ((Ada.Strings.Unbounded.To_Unbounded_String ("none"),        GPIOLINE_FLAG_NONE),
+                                           (Ada.Strings.Unbounded.To_Unbounded_String ("kernel"),      GPIOLINE_FLAG_KERNEL),
+                                           (Ada.Strings.Unbounded.To_Unbounded_String ("is-out"),      GPIOLINE_FLAG_IS_OUT),
                                            (Ada.Strings.Unbounded.To_Unbounded_String ("active-low"),  GPIOLINE_FLAG_ACTIVE_LOW),
                                            (Ada.Strings.Unbounded.To_Unbounded_String ("open-drain"),  GPIOLINE_FLAG_OPEN_DRAIN),
                                            (Ada.Strings.Unbounded.To_Unbounded_String ("open-source"), GPIOLINE_FLAG_OPEN_SOURCE));
 
-   function GPIO_GET_CHIPINFO_IOCTL          (c : Interfaces.Unsigned_32) return Interfaces.Unsigned_32;
-   function GPIO_GET_LINEEVENT_IOCTL         (c : Interfaces.Unsigned_32) return Interfaces.Unsigned_32;
-   function GPIO_GET_LINEHANDLE_IOCTL        (c : Interfaces.Unsigned_32) return Interfaces.Unsigned_32;
-   function GPIO_GET_LINEINFO_IOCTL          (c : Interfaces.Unsigned_32) return Interfaces.Unsigned_32;
-   function GPIOHANDLE_GET_LINE_VALUES_IOCTL (c : Interfaces.Unsigned_32) return Interfaces.Unsigned_32;
-   function GPIOHANDLE_SET_LINE_VALUES_IOCTL (c : Interfaces.Unsigned_32) return Interfaces.Unsigned_32;
+   type gpio_request_record is record
+      name : Ada.Strings.Unbounded.Unbounded_String;
+      mask : mask_type;
+   end record;
+
+   type gpio_request_type is array (Interfaces.Unsigned_32 range 0 .. 5) of gpio_request_record;
+
+   GPIO_Request : constant gpio_request_type := ((Ada.Strings.Unbounded.To_Unbounded_String ("none"),        GPIOHANDLE_REQUEST_NONE),
+                                                 (Ada.Strings.Unbounded.To_Unbounded_String ("input"),       GPIOHANDLE_REQUEST_INPUT),
+                                                 (Ada.Strings.Unbounded.To_Unbounded_String ("output"),      GPIOHANDLE_REQUEST_OUTPUT),
+                                                 (Ada.Strings.Unbounded.To_Unbounded_String ("active-low"),  GPIOHANDLE_REQUEST_ACTIVE_LOW),
+                                                 (Ada.Strings.Unbounded.To_Unbounded_String ("open-drain"),  GPIOHANDLE_REQUEST_OPEN_DRAIN),
+                                                 (Ada.Strings.Unbounded.To_Unbounded_String ("open-source"), GPIOHANDLE_REQUEST_OPEN_DRAIN));
+
+   function  GPIO_GET_CHIPINFO_IOCTL          (C : Interfaces.Unsigned_32) return Interfaces.Unsigned_32;
+   function  GPIO_GET_LINEEVENT_IOCTL         (C : Interfaces.Unsigned_32) return Interfaces.Unsigned_32;
+   function  GPIO_GET_LINEHANDLE_IOCTL        (C : Interfaces.Unsigned_32) return Interfaces.Unsigned_32;
+   function  GPIO_GET_LINEINFO_IOCTL          (C : Interfaces.Unsigned_32) return Interfaces.Unsigned_32;
+   function  GPIOHANDLE_GET_LINE_VALUES_IOCTL (C : Interfaces.Unsigned_32) return Interfaces.Unsigned_32;
+   function  GPIOHANDLE_SET_LINE_VALUES_IOCTL (C : Interfaces.Unsigned_32) return Interfaces.Unsigned_32;
+   function  Is_Bit_Set                       (C : Interfaces.Unsigned_32; B : Interfaces.Unsigned_32) return Boolean;
+   procedure Monitor_CTRL_C_Called;
+   function  Monitor_CTRL_C_Is_Called return Boolean;
+   procedure Monitor_Device_Close             (FD       : fd_type);
+   procedure Monitor_Device_Event_Open        (LDevName       : String;
+                                               Event_Request  : aliased in out Linux_GPIO.gpioevent_request;
+                                               FD             : out fd_type);
+   procedure Monitor_Device_Request_Open      (LDevName       : String;
+                                               Lines          : lineoffsets_array;
+                                               NLines         : Interfaces.Unsigned_32;
+                                               Flags          : flags_type;
+                                               Handle_Data    : aliased in out Linux_GPIO.gpiohandle_data;
+                                               Consumer_Label : Ada.Strings.Unbounded.Unbounded_String;
+                                               FD             : out fd_type);
+   procedure Monitor_Get_Pins                 (fd             : Linux_GPIO.fd_type;
+                                               data           : aliased in out Linux_GPIO.gpiohandle_data);
+   procedure Monitor_Wait_For_Signal          (FD             : fd_type;
+                                               Event_Data     : aliased out Linux_GPIO.gpioevent_data);
+   procedure Monitor_Set_Pins                 (fd             : fd_type;
+                                               data           : aliased in out Linux_GPIO.gpiohandle_data);
 end Linux_GPIO;
