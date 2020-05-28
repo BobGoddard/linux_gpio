@@ -11,10 +11,11 @@ package body Linux_GPIO is
    function C_Ioctl (S : Interfaces.C.int; Req : Interfaces.Unsigned_32; Arg : access Linux_GPIO.gpioevent_request)  return Interfaces.Integer_32;
    pragma Import (C, C_Ioctl, "ioctl");
 
-   handle_data : aliased Linux_GPIO.gpiohandle_data;
+   handle_data     : aliased Linux_GPIO.gpiohandle_data;
    ctrlc           : Boolean := False;
    ioctl_exception : exception;
    read_exception  : exception;
+   label_exception : exception;
 
    function GPIO_GET_CHIPINFO_IOCTL (c : Interfaces.Unsigned_32) return Interfaces.Unsigned_32 is
    begin
@@ -117,10 +118,14 @@ package body Linux_GPIO is
       Request.lineoffsets    := Lines;
       Request.lines          := NLines;
 
-      if Ada.Strings.Unbounded.Length (Consumer_Label) < 32 then
+      if Ada.Strings.Unbounded.Length (Consumer_Label) > 31 then
+         raise label_exception;
+      end if;
+
+      if Ada.Strings.Unbounded.Length (Consumer_Label) < 31 then
          Request.consumer_label := Interfaces.C.To_C (Ada.Strings.Unbounded.To_String (Consumer_Label) & Ada.Characters.Latin_1.NUL & Blanks_32 ((Ada.Strings.Unbounded.Length (Consumer_Label) + 1) .. Blanks_32'Length));
       else
-         Request.consumer_label := Interfaces.C.To_C (Ada.Strings.Unbounded.To_String (Consumer_Label));
+         Request.consumer_label := Interfaces.C.To_C (Ada.Strings.Unbounded.To_String (Consumer_Label) & Ada.Characters.Latin_1.NUL);
       end if;
 
       fd := fd_type (GNAT.OS_Lib.Open_Read_Write (ldevname, lmode));
