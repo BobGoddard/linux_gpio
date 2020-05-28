@@ -113,20 +113,20 @@ package body Linux_GPIO is
       ret             : Interfaces.Integer_32;
       lmode           : constant GNAT.OS_Lib.Mode := GNAT.OS_Lib.Text;
       monitor_open    : exception;
-      Blanks_32       : String := "                                "; --  32 of...
+      Blanks_32       : String := Ada.Characters.Latin_1.NUL & "                               "; --  31 of...
    begin
       Request.flags          := Flags;
       Request.lineoffsets    := Lines;
       Request.lines          := NLines;
 
-      Ada.Text_IO.Put_Line ("label length: " & Ada.Strings.Unbounded.Length (Consumer_Label)'Image);
+      Ada.Text_IO.Put_Line ("label length: " & Ada.Strings.Unbounded.Length (Consumer_Label)'Image & ", length2: " & Integer (Ada.Strings.Unbounded.Length (Consumer_Label) + 1)'Image & ", blength: " & Blanks_32'Length'Image);
 
       if Ada.Strings.Unbounded.Length (Consumer_Label) > 31 then
          raise label_exception;
       end if;
 
       if Ada.Strings.Unbounded.Length (Consumer_Label) < 31 then
-         Request.consumer_label := Interfaces.C.To_C (Ada.Strings.Unbounded.To_String (Consumer_Label) & Ada.Characters.Latin_1.NUL & Blanks_32 ((Ada.Strings.Unbounded.Length (Consumer_Label) + 2) .. Blanks_32'Length));
+         Request.consumer_label := Interfaces.C.To_C (Ada.Strings.Unbounded.To_String (Consumer_Label) & Blanks_32 (1 .. (31 - Ada.Strings.Unbounded.Length (Consumer_Label))));
       else
          Request.consumer_label := Interfaces.C.To_C (Ada.Strings.Unbounded.To_String (Consumer_Label));
       end if;
