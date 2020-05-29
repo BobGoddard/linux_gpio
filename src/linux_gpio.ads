@@ -71,7 +71,7 @@ package Linux_GPIO is
       lines          : lines_type;
       fd             : fd_type;
    end record;
-   pragma Convention (C_Pass_By_Copy, gpiohandle_request);
+   pragma Convention (C, gpiohandle_request);
 
    type gpioevent_request is record
       lineoffset     :  pin_nums;
