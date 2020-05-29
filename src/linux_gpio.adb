@@ -49,13 +49,19 @@ package body Linux_GPIO is
    end GPIOHANDLE_SET_LINE_VALUES_IOCTL;
 
    function  Is_Bit_Set                       (C : Interfaces.Unsigned_32; B : Interfaces.Unsigned_32) return Boolean is
+      Tmp_B : Interfaces.Unsigned_32;
+      Tmp_C : Interfaces.Unsigned_32;
       Count : Integer := 1;
    begin
+      Tmp_B := B;
+      Tmp_C := C;
       while Count <= 32 loop
-         if B mod 2 = 1 and then C mod 2 = 1 then
+         if Tmp_B mod 2 = 1 and then Tmp_C mod 2 = 1 then
             return True;
          end if;
 
+         Tmp_B := Shift_Right (Tmp_B, 1);
+         Tmp_C := Shift_Right (Tmp_C, 1);
          Count := Count + 1;
       end loop;
 
@@ -137,6 +143,7 @@ package body Linux_GPIO is
       end if;
 
       if Is_Bit_Set (Flags, GPIOHANDLE_REQUEST_OUTPUT) then
+         Ada.Text_IO.Put_Line ("Bit set...");
          while tmp_integer < Integer (NLines) loop
             aDA.Text_IO.Put_Line ("Setting " & tmp_integer'Image & " to " & Handle_Data.values (tmp_integer)'Image);
             Request.default_values (tmp_integer) := Handle_Data.values (tmp_integer);
