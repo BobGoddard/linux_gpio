@@ -177,19 +177,19 @@ package body Linux_GPIO is
 
    procedure Monitor_Set_Pins (fd   : fd_type;
                                data : gpiohandle_data) is
-      ioctl_data : aliased gpiohandle_data;
+      ioctl_data      : aliased gpiohandle_data;
+      ret             : Interfaces.Integer_32;
    begin
       Ada.Text_IO.Put_Line ("Copying ioctl data");
-      ioctl_data.values := data.values;      Ada.Text_IO.Put_Line ("0 - " & ioctl_data.values (0)'Image);
+      ioctl_data.values := data.values;
+      Ada.Text_IO.Put_Line ("0 - " & ioctl_data.values (0)'Image);
       Ada.Text_IO.Put_Line ("1 - " & ioctl_data.values (1)'Image);
       Ada.Text_IO.Put_Line ("2 - " & ioctl_data.values (2)'Image);
       Ada.Text_IO.Put_Line ("Calling set pin ioctl, size: " & Integer (ioctl_data'Size / 8)'Image & ", IOCTL: " & GPIOHANDLE_SET_LINE_VALUES_IOCTL (ioctl_data'Size / 8)'Image);
-      if C_Ioctl (Interfaces.C.int (fd), 4240393, ioctl_data'Access) < 0 then --  Linux_GPIO.GPIOHANDLE_SET_LINE_VALUES_IOCTL (ioctl_data'Size / 8), ioctl_data'Access) < 0 then
-         null;
---         raise ioctl_exception with GNAT.Source_Info.Line'Img;
+      ret := C_Ioctl (Interfaces.C.int (fd), GPIOHANDLE_SET_LINE_VALUES_IOCTL (ioctl_data'Size / 8), ioctl_data'Access);
+      if ret < 0 then
+         raise ioctl_exception with GNAT.Source_Info.Line'Img;
       end if;
       Ada.Text_IO.Put_Line ("Finished ioctl");
-   exception
-      when E : others => Ada.Text_IO.Put_Line ("What the heck just happened? - " & GNAT.Source_Info.Source_Location & " " & Ada.Exceptions.Exception_Name (E) & " message: " & Ada.Exceptions.Exception_Message (E));
    end Monitor_Set_Pins;
 end Linux_GPIO;
