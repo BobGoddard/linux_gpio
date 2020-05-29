@@ -41,7 +41,7 @@ package Linux_GPIO is
    subtype consumer_type     is Interfaces.C.char_array (0 .. 31);
    subtype fd_type           is Interfaces.C.int;
    type lineoffsets_array    is array (0 .. 63) of Interfaces.Unsigned_32;
-   type values_array         is array (0 .. 63) of Interfaces.C.unsigned_char;
+   type values_array         is array (0 .. 63) of Interfaces.Unsigned_32;
 
    type gpiochip_info is record
       name  : name_type;
@@ -59,7 +59,7 @@ package Linux_GPIO is
    pragma Convention (C_Pass_By_Copy, gpioline_info);
 
    type gpiohandle_data is record
-      values : aliased values_array;
+      values : values_array;
    end record;
    pragma Convention (C_Pass_By_Copy, gpiohandle_data);
 
