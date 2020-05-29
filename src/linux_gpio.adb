@@ -120,7 +120,7 @@ package body Linux_GPIO is
       lmode           : constant GNAT.OS_Lib.Mode := GNAT.OS_Lib.Text;
       monitor_open    : exception;
       Blanks_32       : constant String := Ada.Characters.Latin_1.NUL & "                               "; --  31 of...
-      tmp_integer     : Integer := 0;
+--      tmp_integer     : Integer := 0;
    begin
       Request.flags          := Flags;
       Request.lineoffsets    := Lines;
@@ -143,18 +143,13 @@ package body Linux_GPIO is
       end if;
 
       if Is_Bit_Set (Flags, GPIOHANDLE_REQUEST_OUTPUT) then
-         Ada.Text_IO.Put_Line ("Bit set...");
-         while tmp_integer < Integer (NLines) loop
-            aDA.Text_IO.Put_Line ("Setting " & tmp_integer'Image & " to " & Handle_Data.values (tmp_integer)'Image);
-            Request.default_values (tmp_integer) := Handle_Data.values (tmp_integer);
-            tmp_integer := tmp_integer + 1;
-         end loop;
---         Request.default_values := Handle_Data;
+--         while tmp_integer < Integer (NLines) loop
+--            Request.default_values (tmp_integer) := Handle_Data.values (tmp_integer);
+--            tmp_integer := tmp_integer + 1;
+--         end loop;
+         Request.default_values := Handle_Data.values;
          null;
       end if;
---      Request.default_values (0) := 0;
---      Request.default_values (1) := 0;
---      Request.default_values (2) := 1;
       ret := C_Ioctl (Interfaces.C.int (fd), Linux_GPIO.GPIO_GET_LINEHANDLE_IOCTL (Request'Size / 8), Request'Access);
 
       if ret < 0 then
