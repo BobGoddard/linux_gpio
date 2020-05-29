@@ -114,6 +114,7 @@ package body Linux_GPIO is
       lmode           : constant GNAT.OS_Lib.Mode := GNAT.OS_Lib.Text;
       monitor_open    : exception;
       Blanks_32       : String := Ada.Characters.Latin_1.NUL & "                               "; --  31 of...
+      tmp_integer     : Interfaces.Unsigned_32 := 0;
    begin
       Request.flags          := Flags;
       Request.lineoffsets    := Lines;
@@ -136,7 +137,11 @@ package body Linux_GPIO is
       end if;
 
       if Is_Bit_Set (Flags, GPIOHANDLE_REQUEST_OUTPUT) then
-         Request.default_values := Handle_Data;
+         while tmp_integer < NLines loop
+            Request.default_values.values (Integer (tmp_integer)) := Handle_Data.values (Integer (tmp_integer));
+            tmp_integer := tmp_integer + 1;
+         end loop;
+  --       Request.default_values := Handle_Data;
          null;
       end if;
 
