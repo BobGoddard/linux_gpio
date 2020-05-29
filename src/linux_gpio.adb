@@ -156,8 +156,11 @@ package body Linux_GPIO is
 
    procedure Monitor_Get_Pins (fd   : fd_type;
                                data : aliased in out gpiohandle_data) is
+      ret : Interfaces.Integer_32;
    begin
-      if C_Ioctl (fd, GPIOHANDLE_GET_LINE_VALUES_IOCTL (data'Size / 8), data'Access) < 0 then
+      ret := C_Ioctl (fd, GPIOHANDLE_GET_LINE_VALUES_IOCTL (data'Size / 8), data'Access);
+
+      if ret < 0 then
          raise ioctl_exception with GNAT.Source_Info.Line'Img;
       end if;
    end Monitor_Get_Pins;
