@@ -176,8 +176,9 @@ package body Linux_GPIO is
                                data : gpiohandle_data) is
       ioctl_data : aliased gpiohandle_data;
    begin
-      Ada.Text_IO.Put_Line ("Calling set pin ioctl");
+      Ada.Text_IO.Put_Line ("Copying ioctl data");
       ioctl_data.values := data.values;
+      Ada.Text_IO.Put_Line ("Calling set pin ioctl");
       if C_Ioctl (fd, Linux_GPIO.GPIOHANDLE_SET_LINE_VALUES_IOCTL (ioctl_data'Size / 8), ioctl_data'Access) < 0 then
          raise ioctl_exception with GNAT.Source_Info.Line'Img;
       end if;
