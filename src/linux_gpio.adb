@@ -172,11 +172,13 @@ package body Linux_GPIO is
       end if;
    end Monitor_Wait_For_Signal;
 
-   procedure Monitor_Set_Pins (fd   : Linux_GPIO.fd_type;
-                               data : aliased in out Linux_GPIO.gpiohandle_data) is
+   procedure Monitor_Set_Pins (fd   : fd_type;
+                               data : gpiohandle_data) is
+      ioctl_data : aliased gpiohandle_data;
    begin
       Ada.Text_IO.Put_Line ("Calling set pin ioctl");
-      if C_Ioctl (fd, Linux_GPIO.GPIOHANDLE_SET_LINE_VALUES_IOCTL (data'Size / 8), data'Access) < 0 then
+      ioctl_data.values := data.values;
+      if C_Ioctl (fd, Linux_GPIO.GPIOHANDLE_SET_LINE_VALUES_IOCTL (ioctl_data'Size / 8), ioctl_data'Access) < 0 then
          raise ioctl_exception with GNAT.Source_Info.Line'Img;
       end if;
       Ada.Text_IO.Put_Line ("Finished ioctl");

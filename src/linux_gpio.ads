@@ -141,5 +141,5 @@ package Linux_GPIO is
    procedure Monitor_Wait_For_Signal          (FD             : fd_type;
                                                Event_Data     : aliased out Linux_GPIO.gpioevent_data);
    procedure Monitor_Set_Pins                 (fd             : fd_type;
-                                               data           : aliased in out Linux_GPIO.gpiohandle_data);
+                                               data           : gpiohandle_data);
 end Linux_GPIO;
