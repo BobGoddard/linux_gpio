@@ -186,7 +186,7 @@ package body Linux_GPIO is
       Ada.Text_IO.Put_Line ("1 - " & ioctl_data.values (1)'Image);
       Ada.Text_IO.Put_Line ("2 - " & ioctl_data.values (2)'Image);
       Ada.Text_IO.Put_Line ("Calling set pin ioctl, size: " & Integer (ioctl_data'Size / 8)'Image & ", IOCTL: " & GPIOHANDLE_SET_LINE_VALUES_IOCTL (ioctl_data'Size / 8)'Image);
-      ret := C_Ioctl (Interfaces.C.int (fd), GPIOHANDLE_SET_LINE_VALUES_IOCTL (ioctl_data'Size / 8), ioctl_data'Access);
+      ret := C_Ioctl (Interfaces.C.int (fd), 4240393, ioctl_data'Access);
       Ada.Text_IO.Put_Line ("ret: " & ret'Image);
       if ret < 0 then
          raise ioctl_exception with GNAT.Source_Info.Line'Img;
