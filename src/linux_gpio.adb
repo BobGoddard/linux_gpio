@@ -146,6 +146,8 @@ package body Linux_GPIO is
 
       ret := C_Ioctl (Interfaces.C.int (fd), Linux_GPIO.GPIO_GET_LINEHANDLE_IOCTL (Request'Size / 8), Request'Access);
 
+      Ada.Text_IO.Put_Line ("Calling dev req open ioctl, size: " & Integer (Request'Size / 8)'Image & ", IOCTL: " & GPIO_GET_LINEHANDLE_IOCTL (Request'Size / 8)'Image);
+
       if ret < 0 then
          raise ioctl_exception with "GPIO_GET_LINEEVENT_IOCTL error : " & ret'Image & ", errno := " & GNAT.OS_Lib.Errno'Img & ", " & GNAT.OS_Lib.Errno_Message;
       end if;
