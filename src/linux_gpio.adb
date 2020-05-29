@@ -144,7 +144,9 @@ package body Linux_GPIO is
 --         Request.default_values := Handle_Data;
          null;
       end if;
-
+      Request.default_values (0) := 0;
+      Request.default_values (1) := 0;
+      Request.default_values (2) := 1;
       ret := C_Ioctl (Interfaces.C.int (fd), Linux_GPIO.GPIO_GET_LINEHANDLE_IOCTL (Request'Size / 8), Request'Access);
 
       if ret < 0 then
