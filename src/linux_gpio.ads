@@ -61,7 +61,7 @@ package Linux_GPIO is
    type gpiohandle_data is record
       values : values_array;
    end record;
-   pragma Convention (C_Pass_By_Copy, gpiohandle_data);
+   pragma Convention (C, gpiohandle_data);
 
    type gpiohandle_request is record
       lineoffsets    : lineoffsets_array;

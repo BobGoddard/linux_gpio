@@ -8,9 +8,9 @@ with Interfaces.C; use Interfaces.C;
 with Linux_ioctl_helpers;
 
 package body Linux_GPIO is
-   function C_Ioctl (S : Interfaces.C.int; Req : Interfaces.Unsigned_32; Arg : access Linux_GPIO.gpiohandle_data)    return Interfaces.Integer_32;
-   function C_Ioctl (S : Interfaces.C.int; Req : Interfaces.Unsigned_32; Arg : access Linux_GPIO.gpiohandle_request) return Interfaces.Integer_32;
-   function C_Ioctl (S : Interfaces.C.int; Req : Interfaces.Unsigned_32; Arg : access Linux_GPIO.gpioevent_request)  return Interfaces.Integer_32;
+   function C_Ioctl (S : Interfaces.C.int; Req : Interfaces.Unsigned_32; Arg : access gpiohandle_data)    return Interfaces.Integer_32;
+   function C_Ioctl (S : Interfaces.C.int; Req : Interfaces.Unsigned_32; Arg : access gpiohandle_request) return Interfaces.Integer_32;
+   function C_Ioctl (S : Interfaces.C.int; Req : Interfaces.Unsigned_32; Arg : access gpioevent_request)  return Interfaces.Integer_32;
    pragma Import (C, C_Ioctl, "ioctl");
 
    ctrlc           : Boolean := False;
@@ -78,7 +78,7 @@ package body Linux_GPIO is
       return ctrlc;
    end Monitor_CTRL_C_Is_Called;
 
-   procedure Monitor_Device_Close (fd : Linux_GPIO.fd_type) is
+   procedure Monitor_Device_Close (fd : fd_type) is
       monitor_close   : exception;
       res             : Boolean;
    begin
@@ -90,7 +90,7 @@ package body Linux_GPIO is
    end Monitor_Device_Close;
 
    procedure Monitor_Device_Event_Open (ldevname      : String;
-                                  event_request : aliased in out Linux_GPIO.gpioevent_request;
+                                  event_request : aliased in out gpioevent_request;
                                   fd            : out fd_type) is
       ret     : Interfaces.Integer_32;
       lmode   : constant GNAT.OS_Lib.Mode := GNAT.OS_Lib.Text;
@@ -101,7 +101,7 @@ package body Linux_GPIO is
          raise monitor_open with "Open_Read failed... fd : " & fd'Image & ", path : " & ldevname & ", errno := " & GNAT.OS_Lib.Errno'Img & ", " & GNAT.OS_Lib.Errno_Message;
       end if;
 
-      ret := C_Ioctl (Interfaces.C.int (fd), Linux_GPIO.GPIO_GET_LINEEVENT_IOCTL (event_request'Size / 8), event_request'Access);
+      ret := C_Ioctl (Interfaces.C.int (fd), GPIO_GET_LINEEVENT_IOCTL (event_request'Size / 8), event_request'Access);
 
       if ret < 0 then
          raise ioctl_exception with "GPIO_GET_LINEEVENT_IOCTL error : " & ret'Image & ", errno := " & GNAT.OS_Lib.Errno'Img & ", " & GNAT.OS_Lib.Errno_Message;
@@ -112,7 +112,7 @@ package body Linux_GPIO is
                                           Lines          : lineoffsets_array;
                                           NLines         : Interfaces.Unsigned_32;
                                           Flags          : flags_type;
-                                          Handle_Data    : Linux_GPIO.gpiohandle_data;
+                                          Handle_Data    : gpiohandle_data;
                                           Consumer_Label : Ada.Strings.Unbounded.Unbounded_String;
                                           fd             : out fd_type) is
       Request         : aliased gpiohandle_request;
@@ -145,7 +145,7 @@ package body Linux_GPIO is
          Request.default_values := Handle_Data.values;
       end if;
 
-      ret := C_Ioctl (Interfaces.C.int (fd), Linux_GPIO.GPIO_GET_LINEHANDLE_IOCTL (Request'Size / 8), Request'Access);
+      ret := C_Ioctl (Interfaces.C.int (fd), GPIO_GET_LINEHANDLE_IOCTL (Request'Size / 8), Request'Access);
 
       Ada.Text_IO.Put_Line ("Calling dev req open ioctl, size: " & Integer (Request'Size / 8)'Image & ", IOCTL: " & GPIO_GET_LINEHANDLE_IOCTL (Request'Size / 8)'Image);
 
@@ -154,19 +154,19 @@ package body Linux_GPIO is
       end if;
    end Monitor_Device_Request_Open;
 
-   procedure Monitor_Get_Pins (fd   : Linux_GPIO.fd_type;
-                               data : aliased in out Linux_GPIO.gpiohandle_data) is
+   procedure Monitor_Get_Pins (fd   : fd_type;
+                               data : aliased in out gpiohandle_data) is
    begin
-      if C_Ioctl (fd, Linux_GPIO.GPIOHANDLE_GET_LINE_VALUES_IOCTL (data'Size / 8), data'Access) < 0 then
+      if C_Ioctl (fd, GPIOHANDLE_GET_LINE_VALUES_IOCTL (data'Size / 8), data'Access) < 0 then
          raise ioctl_exception with GNAT.Source_Info.Line'Img;
       end if;
    end Monitor_Get_Pins;
 
-   procedure Monitor_Wait_For_Signal (fd          : Linux_GPIO.fd_type;
-                                      event_data  : aliased out Linux_GPIO.gpioevent_data) is
-      handle_data     : aliased Linux_GPIO.gpiohandle_data;
+   procedure Monitor_Wait_For_Signal (fd          : fd_type;
+                                      event_data  : aliased out gpioevent_data) is
+      handle_data     : aliased gpiohandle_data;
    begin
-      if C_Ioctl (fd, Linux_GPIO.GPIOHANDLE_GET_LINE_VALUES_IOCTL (handle_data'Size / 8), handle_data'Access) < 0 then
+      if C_Ioctl (fd, GPIOHANDLE_GET_LINE_VALUES_IOCTL (handle_data'Size / 8), handle_data'Access) < 0 then
          raise ioctl_exception with GNAT.Source_Info.Line'Img;
       end if;
 
@@ -186,7 +186,7 @@ package body Linux_GPIO is
       Ada.Text_IO.Put_Line ("1 - " & ioctl_data.values (1)'Image);
       Ada.Text_IO.Put_Line ("2 - " & ioctl_data.values (2)'Image);
       Ada.Text_IO.Put_Line ("Calling set pin ioctl, size: " & Integer (ioctl_data'Size / 8)'Image & ", IOCTL: " & GPIOHANDLE_SET_LINE_VALUES_IOCTL (ioctl_data'Size / 8)'Image);
-      ret := C_Ioctl (Interfaces.C.int (fd), 4240393, ioctl_data'Access);
+      ret := C_Ioctl (Interfaces.C.int (fd), GPIOHANDLE_SET_LINE_VALUES_IOCTL (ioctl_data'Size / 8), ioctl_data'Access);
       Ada.Text_IO.Put_Line ("ret: " & ret'Image);
       if ret < 0 then
          raise ioctl_exception with GNAT.Source_Info.Line'Img;
