@@ -41,7 +41,7 @@ package Linux_GPIO is
    subtype consumer_type     is Interfaces.C.char_array (0 .. 31);
    subtype fd_type           is Interfaces.C.int;
    type lineoffsets_array    is array (0 .. 63) of Interfaces.Unsigned_32;
-   type values_array         is array (0 .. 63) of Interfaces.Unsigned_32;
+   type values_array         is array (0 .. 63) of Interfaces.Integer_8;
 
    type gpiochip_info is record
       name  : name_type;
