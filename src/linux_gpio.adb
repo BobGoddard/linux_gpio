@@ -12,7 +12,6 @@ package body Linux_GPIO is
    function C_Ioctl (S : Interfaces.C.int; Req : Interfaces.Unsigned_32; Arg : access Linux_GPIO.gpioevent_request)  return Interfaces.Integer_32;
    pragma Import (C, C_Ioctl, "ioctl");
 
-   handle_data     : aliased Linux_GPIO.gpiohandle_data;
    ctrlc           : Boolean := False;
    ioctl_exception : exception;
    read_exception  : exception;
@@ -162,6 +161,7 @@ package body Linux_GPIO is
 
    procedure Monitor_Wait_For_Signal (fd          : Linux_GPIO.fd_type;
                                       event_data  : aliased out Linux_GPIO.gpioevent_data) is
+      handle_data     : aliased Linux_GPIO.gpiohandle_data;
    begin
       if C_Ioctl (fd, Linux_GPIO.GPIOHANDLE_GET_LINE_VALUES_IOCTL (handle_data'Size / 8), handle_data'Access) < 0 then
          raise ioctl_exception with GNAT.Source_Info.Line'Img;
@@ -179,6 +179,9 @@ package body Linux_GPIO is
       Ada.Text_IO.Put_Line ("Copying ioctl data");
       ioctl_data.values := data.values;
       Ada.Text_IO.Put_Line ("Calling set pin ioctl");
+      Ada.Text_IO.Put_Line ("0 - " & ioctl_data.values (0)'Image);
+      Ada.Text_IO.Put_Line ("1 - " & ioctl_data.values (1)'Image);
+      Ada.Text_IO.Put_Line ("2 - " & ioctl_data.values (2)'Image);
       if C_Ioctl (fd, Linux_GPIO.GPIOHANDLE_SET_LINE_VALUES_IOCTL (ioctl_data'Size / 8), ioctl_data'Access) < 0 then
          raise ioctl_exception with GNAT.Source_Info.Line'Img;
       end if;
