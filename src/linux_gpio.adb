@@ -136,7 +136,7 @@ package body Linux_GPIO is
          Request.consumer_label := Interfaces.C.To_C (Ada.Strings.Unbounded.To_String (Consumer_Label));
       end if;
 
-      fd := fd_type (GNAT.OS_Lib.Open_Read_Write (ldevname, lmode));
+      fd := fd_type (GNAT.OS_Lib.Open_Read (ldevname, lmode));
 
       if fd < 0 then
          raise monitor_open with "Open_Read failed... fd : " & fd'Image & ", path : " & ldevname & ", errno := " & GNAT.OS_Lib.Errno'Img & ", " & GNAT.OS_Lib.Errno_Message;
