@@ -135,7 +135,8 @@ package Linux_GPIO is
                                                Flags          : flags_type;
                                                Handle_Data    : Linux_GPIO.gpiohandle_data;
                                                Consumer_Label : Ada.Strings.Unbounded.Unbounded_String;
-                                               FD             : out fd_type);
+                                               FD             : out fd_type;
+                                               IOCTL_FD       : out fd_type);
    procedure Monitor_Get_Pins                 (fd             : Linux_GPIO.fd_type;
                                                data           : aliased in out Linux_GPIO.gpiohandle_data);
    procedure Monitor_Wait_For_Signal          (FD             : fd_type;

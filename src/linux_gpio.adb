@@ -114,7 +114,8 @@ package body Linux_GPIO is
                                           Flags          : flags_type;
                                           Handle_Data    : gpiohandle_data;
                                           Consumer_Label : Ada.Strings.Unbounded.Unbounded_String;
-                                          fd             : out fd_type) is
+                                          fd             : out fd_type;
+                                          IOCTL_FD       : out fd_type) is
       Request         : aliased gpiohandle_request;
       ret             : Interfaces.Integer_32;
       lmode           : constant GNAT.OS_Lib.Mode := GNAT.OS_Lib.Text;
@@ -146,6 +147,7 @@ package body Linux_GPIO is
       end if;
 
       ret := C_Ioctl (Interfaces.C.int (fd), GPIO_GET_LINEHANDLE_IOCTL (Request'Size / 8), Request'Access);
+      IOCTL_FD := Request.fd;
 
       Ada.Text_IO.Put_Line ("Calling dev req open ioctl, size: " & Integer (Request'Size / 8)'Image & ", IOCTL: " & GPIO_GET_LINEHANDLE_IOCTL (Request'Size / 8)'Image);
 
