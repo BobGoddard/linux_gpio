@@ -138,7 +138,7 @@ package body Linux_GPIO is
 
       if Is_Bit_Set (Flags, GPIOHANDLE_REQUEST_OUTPUT) then
          while tmp_integer < Integer (NLines) loop
-            Request.default_values.values (tmp_integer) := Handle_Data.values (tmp_integer);
+            Request.default_values (tmp_integer) := Handle_Data.values (tmp_integer);
             tmp_integer := tmp_integer + 1;
          end loop;
 --         Request.default_values := Handle_Data;

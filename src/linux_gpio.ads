@@ -66,7 +66,7 @@ package Linux_GPIO is
    type gpiohandle_request is record
       lineoffsets    : lineoffsets_array;
       flags          : flags_type;
-      default_values : gpiohandle_data;
+      default_values : values_array;
       consumer_label : consumer_type;
       lines          : lines_type;
       fd             : fd_type;
