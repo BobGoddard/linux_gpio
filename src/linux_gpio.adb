@@ -138,6 +138,7 @@ package body Linux_GPIO is
 
       if Is_Bit_Set (Flags, GPIOHANDLE_REQUEST_OUTPUT) then
          while tmp_integer < Integer (NLines) loop
+            aDA.Text_IO.Put_Line ("Setting " & tmp_integer'Image & " to " & Handle_Data.values (tmp_integer)'Image);
             Request.default_values (tmp_integer) := Handle_Data.values (tmp_integer);
             tmp_integer := tmp_integer + 1;
          end loop;
