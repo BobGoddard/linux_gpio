@@ -133,7 +133,7 @@ package Linux_GPIO is
                                                Lines          : lineoffsets_array;
                                                NLines         : Interfaces.Unsigned_32;
                                                Flags          : flags_type;
-                                               Handle_Data    : aliased in out Linux_GPIO.gpiohandle_data;
+                                               Handle_Data    : Linux_GPIO.gpiohandle_data;
                                                Consumer_Label : Ada.Strings.Unbounded.Unbounded_String;
                                                FD             : out fd_type);
    procedure Monitor_Get_Pins                 (fd             : Linux_GPIO.fd_type;

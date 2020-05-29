@@ -106,7 +106,7 @@ package body Linux_GPIO is
                                           Lines          : lineoffsets_array;
                                           NLines         : Interfaces.Unsigned_32;
                                           Flags          : flags_type;
-                                          Handle_Data    : aliased in out Linux_GPIO.gpiohandle_data;
+                                          Handle_Data    : Linux_GPIO.gpiohandle_data;
                                           Consumer_Label : Ada.Strings.Unbounded.Unbounded_String;
                                           fd             : out fd_type) is
       Request         : aliased gpiohandle_request;
@@ -118,8 +118,6 @@ package body Linux_GPIO is
       Request.flags          := Flags;
       Request.lineoffsets    := Lines;
       Request.lines          := NLines;
-
-      Ada.Text_IO.Put_Line ("label length: " & Ada.Strings.Unbounded.Length (Consumer_Label)'Image & ", length2: " & Integer (Ada.Strings.Unbounded.Length (Consumer_Label) + 1)'Image & ", blength: " & Blanks_32'Length'Image);
 
       if Ada.Strings.Unbounded.Length (Consumer_Label) > 31 then
          raise label_exception;
