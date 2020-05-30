@@ -104,7 +104,7 @@ package body Linux_GPIO is
 
    procedure Monitor_Device_Event_Open (LDev_Name     : String;
                                         Event_Request : aliased in out GPIO_Event_Request;
-                                        FD            : out FD_Type) is
+                                        IOCTL_FD      : out FD_Type) is
       Ret               : Interfaces.Integer_32;
       LMode             : constant GNAT.OS_Lib.Mode := GNAT.OS_Lib.Text;
       Monitor_Excpetion : exception;
