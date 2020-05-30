@@ -116,13 +116,12 @@ package body Linux_GPIO is
       end if;
 
       Ret := C_Ioctl (Interfaces.C.int (FD), GPIO_GET_LINEEVENT_IOCTL (Event_Request'Size / 8), Event_Request'Access);
+      IOCTL_FD := Event_Request.FD;
+      Monitor_Device_Close (FD);
 
       if Ret < 0 then
          raise IOCTL_Exception with "GPIO_GET_LINEEVENT_IOCTL error : " & Ret'Image & ", errno := " & GNAT.OS_Lib.Errno'Img & ", " & GNAT.OS_Lib.Errno_Message;
       end if;
-
-      IOCTL_FD := Event_Request.FD;
-      Monitor_Device_Close (FD);
    end Monitor_Device_Event_Open;
 
    procedure Monitor_Device_Event_Open (LDev_Name      : String;
@@ -135,8 +134,9 @@ package body Linux_GPIO is
       Event_Request   : aliased GPIO_Event_Request;
       FD              : FD_Type;
    begin
-      Event_Request.Line_Offset := Pin;
-      Event_Request.Handle_Flags := Flags;
+      Event_Request.Line_Offset    := Pin;
+      Event_Request.Event_Flags    := Flags;
+      Event_Request.Handle_Flags   := Linux_GPIO.GPIOHANDLE_REQUEST_NONE;
       Event_Request.Consumer_Label := Get_Label (Consumer_Label);
       FD := FD_Type (GNAT.OS_Lib.Open_Read (LDev_Name, LMode));
 
@@ -144,7 +144,7 @@ package body Linux_GPIO is
          raise Monitor_Open with "Open_Read failed... fd : " & FD'Image & ", path : " & LDev_Name & ", errno := " & GNAT.OS_Lib.Errno'Img & ", " & GNAT.OS_Lib.Errno_Message;
       end if;
 
-      Ret := C_Ioctl (Interfaces.C.int (FD), GPIO_GET_LINEEVENT_IOCTL (Event_Request'Size / 8), Event_Request'Access);
+      Ret      := C_Ioctl (Interfaces.C.int (FD), GPIO_GET_LINEEVENT_IOCTL (Event_Request'Size / 8), Event_Request'Access);
       IOCTL_FD := Event_Request.FD;
       Monitor_Device_Close (FD);
 
