@@ -108,6 +108,7 @@ package body Linux_GPIO is
       Ret               : Interfaces.Integer_32;
       LMode             : constant GNAT.OS_Lib.Mode := GNAT.OS_Lib.Text;
       Monitor_Excpetion : exception;
+      FD                : FD_Type;
    begin
       FD := FD_Type (GNAT.OS_Lib.Open_Read_Write (LDev_Name, LMode));
       if FD < 0 then
@@ -120,7 +121,8 @@ package body Linux_GPIO is
          raise IOCTL_Exception with "GPIO_GET_LINEEVENT_IOCTL error : " & Ret'Image & ", errno := " & GNAT.OS_Lib.Errno'Img & ", " & GNAT.OS_Lib.Errno_Message;
       end if;
 
-      --  Monitor_Device_Close (FD);
+      IOCTL_FD := Event_Request.FD;
+      Monitor_Device_Close (FD);
    end Monitor_Device_Event_Open;
 
 --      Event_Request.Line_Offset         := LPin;
