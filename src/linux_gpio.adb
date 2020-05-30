@@ -125,34 +125,33 @@ package body Linux_GPIO is
 --      Event_Request.Handle_Flags        := Linux_GPIO.GPIOHANDLE_REQUEST_NONE;
 --      Event_Request.Consumer_Label      := Interfaces.C.To_C ("Smartmeter pulse" & Ada.Characters.Latin_1.NUL & "              "); -- 31 characters long
 --      Linux_GPIO.Monitor_Device_Event_Open (LDev_Name, Event_Request, Interfaces.C.int (IOCTL_FD_Interrupt));
---      Linux_GPIO.Monitor_Device_Request_Open (LDev_Name, Lines, Num_Lines, Flags, Handle_Data, Label_Pin, IOCTL_FD_LED);
---      Linux_GPIO.Monitor_Device_Close (IOCTL_FD_Interrupt);
---   procedure Monitor_Device_Event_Open (LDev_Name     : String;
---                                        Pin           : Pin_Num;
---                                        Flags          : Linux_GPIO.Handle_Flags_Type;
---                                        Consumer_Label : Ada.Strings.Unbounded.Unbounded_String;
---                                        FD            : out FD_Type) is
---      Ret             : Interfaces.Integer_32;
---      LMode           : constant GNAT.OS_Lib.Mode := GNAT.OS_Lib.Text;
---      Event_Request   : aliased GPIO_Event_Request;
---   begin
---      Event_Request.Line_Offset := Pin;
---      Event_Request.Handle_Flags := Flags;
---      Event_Request.Consumer_Label := Get_Label (Consumer_Label);
---      FD := FD_Type (GNAT.OS_Lib.Open_Read_Write (LDevName, LMode));
---
---      if FD < 0 then
---         raise monitor_open with "Open_Read failed... fd : " & FD'Image & ", path : " & LDevName & ", errno := " & GNAT.OS_Lib.Errno'Img & ", " & GNAT.OS_Lib.Errno_Message;
---      end if;
---
---      ret := C_Ioctl (Interfaces.C.int (FD), GPIO_GET_LINEEVENT_IOCTL (Event_Request'Size / 8), Event_Request'Access);
---      IOCTL_FD := Request.FD;
---      Monitor_Device_Close (FD);
---
---      if ret < 0 then
---         raise ioctl_exception with "GPIO_GET_LINEEVENT_IOCTL error : " & Ret'Image & ", errno := " & GNAT.OS_Lib.Errno'Img & ", " & GNAT.OS_Lib.Errno_Message;
---      end if;
---   end Monitor_Device_Event_Open;
+   procedure Monitor_Device_Event_Open (LDev_Name      : String;
+                                        Pin            : Pin_Num;
+                                        Flags          : Linux_GPIO.Handle_Flags_Type;
+                                        Consumer_Label : Ada.Strings.Unbounded.Unbounded_String;
+                                        IOCTL_FD       : out FD_Type) is
+      Ret             : Interfaces.Integer_32;
+      LMode           : constant GNAT.OS_Lib.Mode := GNAT.OS_Lib.Text;
+      Event_Request   : aliased GPIO_Event_Request;
+      FD              : FD_Type;
+   begin
+      Event_Request.Line_Offset := Pin;
+      Event_Request.Handle_Flags := Flags;
+      Event_Request.Consumer_Label := Get_Label (Consumer_Label);
+      FD := FD_Type (GNAT.OS_Lib.Open_Read (LDev_Name, LMode));
+
+      if FD < 0 then
+         raise Monitor_Open with "Open_Read failed... fd : " & FD'Image & ", path : " & LDev_Name & ", errno := " & GNAT.OS_Lib.Errno'Img & ", " & GNAT.OS_Lib.Errno_Message;
+      end if;
+
+      Ret := C_Ioctl (Interfaces.C.int (FD), GPIO_GET_LINEEVENT_IOCTL (Event_Request'Size / 8), Event_Request'Access);
+      IOCTL_FD := Event_Request.FD;
+      Monitor_Device_Close (FD);
+
+      if Ret < 0 then
+         raise IOCTL_Exception with "GPIO_GET_LINEEVENT_IOCTL error : " & Ret'Image & ", errno := " & GNAT.OS_Lib.Errno'Img & ", " & GNAT.OS_Lib.Errno_Message;
+      end if;
+   end Monitor_Device_Event_Open;
 
    procedure Monitor_Device_Request_Open (LDev_Name      : String;
                                           Lines          : Line_Offsets_Array;

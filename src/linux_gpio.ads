@@ -129,6 +129,11 @@ package Linux_GPIO is
    procedure Monitor_Device_Event_Open        (LDev_Name      : String;
                                                Event_Request  : aliased in out GPIO_Event_Request;
                                                FD             : out FD_Type);
+   procedure Monitor_Device_Event_Open        (LDev_Name      : String;
+                                               Pin            : Pin_Num;
+                                               Flags          : Linux_GPIO.Handle_Flags_Type;
+                                               Consumer_Label : Ada.Strings.Unbounded.Unbounded_String;
+                                               IOCTL_FD       : out FD_Type);
    procedure Monitor_Device_Request_Open      (LDev_Name      : String;
                                                Lines          : Line_Offsets_Array;
                                                NLines         : Interfaces.Unsigned_32;
