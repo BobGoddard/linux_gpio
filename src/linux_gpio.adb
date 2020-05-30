@@ -119,6 +119,8 @@ package body Linux_GPIO is
       if Ret < 0 then
          raise IOCTL_Exception with "GPIO_GET_LINEEVENT_IOCTL error : " & Ret'Image & ", errno := " & GNAT.OS_Lib.Errno'Img & ", " & GNAT.OS_Lib.Errno_Message;
       end if;
+
+      --  Monitor_Device_Close (FD);
    end Monitor_Device_Event_Open;
 
 --      Event_Request.Line_Offset         := LPin;
