@@ -110,7 +110,7 @@ package body Linux_GPIO is
       Monitor_Excpetion : exception;
       FD                : FD_Type;
    begin
-      FD := FD_Type (GNAT.OS_Lib.Open_Read_Write (LDev_Name, LMode));
+      FD := FD_Type (GNAT.OS_Lib.Open_Read (LDev_Name, LMode));
       if FD < 0 then
          raise Monitor_Excpetion with "Open_Read failed... fd : " & FD'Image & ", path : " & LDev_Name & ", errno := " & GNAT.OS_Lib.Errno'Img & ", " & GNAT.OS_Lib.Errno_Message;
       end if;
@@ -125,10 +125,6 @@ package body Linux_GPIO is
       Monitor_Device_Close (FD);
    end Monitor_Device_Event_Open;
 
---      Event_Request.Line_Offset         := LPin;
---      Event_Request.Handle_Flags        := Linux_GPIO.GPIOHANDLE_REQUEST_NONE;
---      Event_Request.Consumer_Label      := Interfaces.C.To_C ("Smartmeter pulse" & Ada.Characters.Latin_1.NUL & "              "); -- 31 characters long
---      Linux_GPIO.Monitor_Device_Event_Open (LDev_Name, Event_Request, Interfaces.C.int (IOCTL_FD_Interrupt));
    procedure Monitor_Device_Event_Open (LDev_Name      : String;
                                         Pin            : Pin_Num;
                                         Flags          : Linux_GPIO.Handle_Flags_Type;
@@ -142,7 +138,7 @@ package body Linux_GPIO is
       Event_Request.Line_Offset := Pin;
       Event_Request.Handle_Flags := Flags;
       Event_Request.Consumer_Label := Get_Label (Consumer_Label);
-      FD := FD_Type (GNAT.OS_Lib.Open_Read_Write (LDev_Name, LMode));
+      FD := FD_Type (GNAT.OS_Lib.Open_Read (LDev_Name, LMode));
 
       if FD < 0 then
          raise Monitor_Open with "Open_Read failed... fd : " & FD'Image & ", path : " & LDev_Name & ", errno := " & GNAT.OS_Lib.Errno'Img & ", " & GNAT.OS_Lib.Errno_Message;
