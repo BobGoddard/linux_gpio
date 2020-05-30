@@ -138,7 +138,7 @@ package body Linux_GPIO is
       Event_Request.Line_Offset := Pin;
       Event_Request.Handle_Flags := Flags;
       Event_Request.Consumer_Label := Get_Label (Consumer_Label);
-      FD := FD_Type (GNAT.OS_Lib.Open_Read (LDev_Name, LMode));
+      FD := FD_Type (GNAT.OS_Lib.Open_Read_Write (LDev_Name, LMode));
 
       if FD < 0 then
          raise Monitor_Open with "Open_Read failed... fd : " & FD'Image & ", path : " & LDev_Name & ", errno := " & GNAT.OS_Lib.Errno'Img & ", " & GNAT.OS_Lib.Errno_Message;
