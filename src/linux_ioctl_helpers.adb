@@ -1,6 +1,6 @@
 with Logical_Opps;
 
-package body Linux_ioctl_helpers is
+package body Linux_IOCTL_Helpers is
 
    function C_IO (stype : Interfaces.Unsigned_32; nr : Interfaces.Unsigned_32) return Interfaces.Unsigned_32 is
    begin
@@ -67,4 +67,4 @@ package body Linux_ioctl_helpers is
       return C_IOC (C_IOC_READ or C_IOC_WRITE, stype, nr, size'Size);
    end C_IOWR_BAD;
 
-end Linux_ioctl_helpers;
+end Linux_IOCTL_Helpers;

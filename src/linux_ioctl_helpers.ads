@@ -1,6 +1,6 @@
 with Interfaces; use Interfaces;
 
-package Linux_ioctl_helpers is
+package Linux_IOCTL_Helpers is
 
    C_IOC_NRBITS    : constant :=  8;
    C_IOC_TYPEBITS  : constant :=  8;
@@ -37,4 +37,4 @@ package Linux_ioctl_helpers is
    function C_IOW_BAD       (stype : Interfaces.Unsigned_32; nr : Interfaces.Unsigned_32; size : Interfaces.Unsigned_32) return Interfaces.Unsigned_32;
    function C_IOWR          (stype : Interfaces.Unsigned_32; nr : Interfaces.Unsigned_32; size : Interfaces.Unsigned_32) return Interfaces.Unsigned_32;
    function C_IOWR_BAD      (stype : Interfaces.Unsigned_32; nr : Interfaces.Unsigned_32; size : Interfaces.Unsigned_32) return Interfaces.Unsigned_32;
-end Linux_ioctl_helpers;
+end Linux_IOCTL_Helpers;
