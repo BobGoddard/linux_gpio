@@ -74,7 +74,7 @@ package Linux_GPIO is
    pragma Convention (C, GPIO_Handle_Request);
 
    type GPIO_Event_Request is record
-      Line_Offfset   :  Pin_Nums;
+      Line_Offset    :  Pin_Nums;
       Handle_Flags   :  Handle_Flags_Type;
       Event_Flags    :  Event_Flags_Type;
       Consumer_Label :  Consumer_Type;
