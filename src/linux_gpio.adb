@@ -1,18 +1,15 @@
 with Ada.Characters.Latin_1;
-with Ada.Exceptions;
-with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
-with Ada.Text_IO;
 with GNAT.OS_Lib;
 with GNAT.Source_Info;
 with Interfaces.C; use Interfaces.C;
-with Linux_ioctl_helpers;
+with Linux_IOCTL_Helpers;
 
 package body Linux_GPIO is
    function C_Ioctl (S : Interfaces.C.int; Req : Interfaces.Unsigned_32; Arg : access GPIO_Handle_Data)    return Interfaces.Integer_32;
    function C_Ioctl (S : Interfaces.C.int; Req : Interfaces.Unsigned_32; Arg : access GPIO_Handle_Request) return Interfaces.Integer_32;
    function C_Ioctl (S : Interfaces.C.int; Req : Interfaces.Unsigned_32; Arg : access GPIO_Event_Request)  return Interfaces.Integer_32;
    pragma Import (C, C_Ioctl, "ioctl");
-   function Get_Label (S : Ada.Strings.Unbounded.Unbounded_String) return consumer_type;
+   function Get_Label (S : Ada.Strings.Unbounded.Unbounded_String) return Consumer_Type;
 
    CTRL_C          : Boolean := False;
    Blanks_32       : constant String := Ada.Characters.Latin_1.NUL & "                               "; --  31 of...
@@ -21,7 +18,7 @@ package body Linux_GPIO is
    Read_Exception  : exception;
    Label_Exception : exception;
 
-   function Get_Label (S : Ada.Strings.Unbounded.Unbounded_String) return consumer_type is
+   function Get_Label (S : Ada.Strings.Unbounded.Unbounded_String) return Consumer_Type is
    begin
       if Ada.Strings.Unbounded.Length (S) > 31 then
          raise Label_Exception;
@@ -39,29 +36,29 @@ package body Linux_GPIO is
       return Linux_IOCTL_Helpers.C_IOR (16#B4#, 16#1#, C);
    end GPIO_GET_CHIPINFO_IOCTL;
 
-   function GPIO_GET_LINEEVENT_IOCTL (c : Interfaces.Unsigned_32) return Interfaces.Unsigned_32 is
+   function GPIO_GET_LINEEVENT_IOCTL (C : Interfaces.Unsigned_32) return Interfaces.Unsigned_32 is
    begin
-      return Linux_IOCTL_Helpers.C_IOWR (16#B4#, 16#4#, c);
+      return Linux_IOCTL_Helpers.C_IOWR (16#B4#, 16#4#, C);
    end GPIO_GET_LINEEVENT_IOCTL;
 
-   function GPIO_GET_LINEHANDLE_IOCTL (c : Interfaces.Unsigned_32) return Interfaces.Unsigned_32 is
+   function GPIO_GET_LINEHANDLE_IOCTL (C : Interfaces.Unsigned_32) return Interfaces.Unsigned_32 is
    begin
-      return Linux_IOCTL_Helpers.C_IOWR (16#B4#, 16#3#, c);
+      return Linux_IOCTL_Helpers.C_IOWR (16#B4#, 16#3#, C);
    end GPIO_GET_LINEHANDLE_IOCTL;
 
-   function GPIO_GET_LINEINFO_IOCTL (c : Interfaces.Unsigned_32) return Interfaces.Unsigned_32 is
+   function GPIO_GET_LINEINFO_IOCTL (C : Interfaces.Unsigned_32) return Interfaces.Unsigned_32 is
    begin
-      return Linux_IOCTL_Helpers.C_IOWR (16#B4#, 16#2#, c);
+      return Linux_IOCTL_Helpers.C_IOWR (16#B4#, 16#2#, C);
    end GPIO_GET_LINEINFO_IOCTL;
 
-   function GPIOHANDLE_GET_LINE_VALUES_IOCTL (c : Interfaces.Unsigned_32) return Interfaces.Unsigned_32 is
+   function GPIOHANDLE_GET_LINE_VALUES_IOCTL (C : Interfaces.Unsigned_32) return Interfaces.Unsigned_32 is
    begin
-      return Linux_IOCTL_Helpers.C_IOWR (16#B4#, 16#8#, c);
+      return Linux_IOCTL_Helpers.C_IOWR (16#B4#, 16#8#, C);
    end GPIOHANDLE_GET_LINE_VALUES_IOCTL;
 
-   function GPIOHANDLE_SET_LINE_VALUES_IOCTL (c : Interfaces.Unsigned_32) return Interfaces.Unsigned_32 is
+   function GPIOHANDLE_SET_LINE_VALUES_IOCTL (C : Interfaces.Unsigned_32) return Interfaces.Unsigned_32 is
    begin
-      return Linux_IOCTL_Helpers.C_IOWR (16#B4#, 16#9#, c);
+      return Linux_IOCTL_Helpers.C_IOWR (16#B4#, 16#9#, C);
    end GPIOHANDLE_SET_LINE_VALUES_IOCTL;
 
    function  Is_Bit_Set                       (C : Interfaces.Unsigned_32; B : Interfaces.Unsigned_32) return Boolean is
@@ -101,20 +98,20 @@ package body Linux_GPIO is
       GNAT.OS_Lib.Close (GNAT.OS_Lib.File_Descriptor (FD), Res);
 
       if not Res then
-         raise monitor_close with "Close failed on fd: " & FD'Image & ", errno := " & GNAT.OS_Lib.Errno'Img & ", " & GNAT.OS_Lib.Errno_Message;
+         raise Monitor_Close with "Close failed on fd: " & FD'Image & ", errno := " & GNAT.OS_Lib.Errno'Img & ", " & GNAT.OS_Lib.Errno_Message;
       end if;
    end Monitor_Device_Close;
 
    procedure Monitor_Device_Event_Open (LDev_Name     : String;
                                         Event_Request : aliased in out GPIO_Event_Request;
                                         FD            : out FD_Type) is
-      Ret          : Interfaces.Integer_32;
-      LMode        : constant GNAT.OS_Lib.Mode := GNAT.OS_Lib.Text;
-      Monitor_Open : exception;
+      Ret               : Interfaces.Integer_32;
+      LMode             : constant GNAT.OS_Lib.Mode := GNAT.OS_Lib.Text;
+      Monitor_Excpetion : exception;
    begin
       FD := FD_Type (GNAT.OS_Lib.Open_Read_Write (LDev_Name, LMode));
       if FD < 0 then
-         raise Monitor_Open with "Open_Read failed... fd : " & FD'Image & ", path : " & LDev_Name & ", errno := " & GNAT.OS_Lib.Errno'Img & ", " & GNAT.OS_Lib.Errno_Message;
+         raise Monitor_Excpetion with "Open_Read failed... fd : " & FD'Image & ", path : " & LDev_Name & ", errno := " & GNAT.OS_Lib.Errno'Img & ", " & GNAT.OS_Lib.Errno_Message;
       end if;
 
       Ret := C_Ioctl (Interfaces.C.int (FD), GPIO_GET_LINEEVENT_IOCTL (Event_Request'Size / 8), Event_Request'Access);
@@ -124,7 +121,6 @@ package body Linux_GPIO is
       end if;
    end Monitor_Device_Event_Open;
 
-
 --      Event_Request.Line_Offset         := LPin;
 --      Event_Request.Handle_Flags        := Linux_GPIO.GPIOHANDLE_REQUEST_NONE;
 --      Event_Request.Consumer_Label      := Interfaces.C.To_C ("Smartmeter pulse" & Ada.Characters.Latin_1.NUL & "              "); -- 31 characters long
@@ -133,17 +129,25 @@ package body Linux_GPIO is
 --      Linux_GPIO.Monitor_Device_Close (IOCTL_FD_Interrupt);
 --   procedure Monitor_Device_Event_Open (LDev_Name     : String;
 --                                        Pin           : Pin_Num;
---                                       FD            : out FD_Type) is
+--                                        Flags          : Linux_GPIO.Handle_Flags_Type;
+--                                        Consumer_Label : Ada.Strings.Unbounded.Unbounded_String;
+--                                        FD            : out FD_Type) is
 --      Ret             : Interfaces.Integer_32;
 --      LMode           : constant GNAT.OS_Lib.Mode := GNAT.OS_Lib.Text;
 --      Event_Request   : aliased GPIO_Event_Request;
 --   begin
+--      Event_Request.Line_Offset := Pin;
+--      Event_Request.Handle_Flags := Flags;
+--      Event_Request.Consumer_Label := Get_Label (Consumer_Label);
 --      FD := FD_Type (GNAT.OS_Lib.Open_Read_Write (LDevName, LMode));
+--
 --      if FD < 0 then
 --         raise monitor_open with "Open_Read failed... fd : " & FD'Image & ", path : " & LDevName & ", errno := " & GNAT.OS_Lib.Errno'Img & ", " & GNAT.OS_Lib.Errno_Message;
 --      end if;
 --
---      ret := C_Ioctl (Interfaces.C.int (fd), GPIO_GET_LINEEVENT_IOCTL (Event_Request'Size / 8), Event_Request'Access);
+--      ret := C_Ioctl (Interfaces.C.int (FD), GPIO_GET_LINEEVENT_IOCTL (Event_Request'Size / 8), Event_Request'Access);
+--      IOCTL_FD := Request.FD;
+--      Monitor_Device_Close (FD);
 --
 --      if ret < 0 then
 --         raise ioctl_exception with "GPIO_GET_LINEEVENT_IOCTL error : " & Ret'Image & ", errno := " & GNAT.OS_Lib.Errno'Img & ", " & GNAT.OS_Lib.Errno_Message;
@@ -177,8 +181,8 @@ package body Linux_GPIO is
          Request.Default_Values := Handle_Data.Values;
       end if;
 
-      Ret := C_Ioctl (Interfaces.C.int (fd), GPIO_GET_LINEHANDLE_IOCTL (Request'Size / 8), Request'Access);
-      IOCTL_FD := Request.fd;
+      Ret := C_Ioctl (Interfaces.C.int (FD), GPIO_GET_LINEHANDLE_IOCTL (Request'Size / 8), Request'Access);
+      IOCTL_FD := Request.FD;
       Monitor_Device_Close (FD);
 
       if Ret < 0 then
@@ -191,12 +195,25 @@ package body Linux_GPIO is
                                Data : aliased in out GPIO_Handle_Data) is
       Ret : Interfaces.Integer_32;
    begin
-      Ret := C_Ioctl (fd, GPIOHANDLE_GET_LINE_VALUES_IOCTL (Data'Size / 8), Data'Access);
+      Ret := C_Ioctl (FD, GPIOHANDLE_GET_LINE_VALUES_IOCTL (Data'Size / 8), Data'Access);
 
       if Ret < 0 then
          raise IOCTL_Exception with GNAT.Source_Info.Line'Img;
       end if;
    end Monitor_Get_Pins;
+
+   procedure Monitor_Set_Pins (FD   : FD_Type;
+                               Data : GPIO_Handle_Data) is
+      IOCTL_Data      : aliased GPIO_Handle_Data;
+      Ret             : Interfaces.Integer_32;
+   begin
+      IOCTL_Data.Values := Data.Values;
+      Ret := C_Ioctl (Interfaces.C.int (FD), GPIOHANDLE_SET_LINE_VALUES_IOCTL (IOCTL_Data'Size / 8), IOCTL_Data'Access);
+
+      if Ret < 0 then
+         raise IOCTL_Exception with GNAT.Source_Info.Line'Img;
+      end if;
+   end Monitor_Set_Pins;
 
    procedure Monitor_Wait_For_Signal (FD          : FD_Type;
                                       Event_Data  : aliased out GPIO_Event_Data) is
@@ -211,16 +228,4 @@ package body Linux_GPIO is
       end if;
    end Monitor_Wait_For_Signal;
 
-   procedure Monitor_Set_Pins (FD   : FD_Type;
-                               Data : GPIO_Handle_Data) is
-      IOCTL_Data      : aliased GPIO_Handle_Data;
-      Ret             : Interfaces.Integer_32;
-   begin
-      IOCTL_Data.Values := data.Values;
-      ret := C_Ioctl (Interfaces.C.int (FD), GPIOHANDLE_SET_LINE_VALUES_IOCTL (IOCTL_Data'Size / 8), IOCTL_Data'Access);
-
-      if Ret < 0 then
-         raise IOCTL_Exception with GNAT.Source_Info.Line'Img;
-      end if;
-   end Monitor_Set_Pins;
 end Linux_GPIO;

@@ -1,8 +1,14 @@
 library project Linux_Gpio is
-    for Languages use ("Ada");
-    for Library_Name use "Linux_Gpio";
-    for Source_Dirs use ("src");
-    for Object_Dir use "obj";
-    for Library_Dir use "lib";
-    for Library_Kind use "Static";
+
+   for Languages use ("Ada");
+   for Library_Name use "Linux_Gpio";
+   for Source_Dirs use ("/home/src/build/Ada/linux_gpio/src");
+   for Object_Dir use "obj";
+   for Library_Dir use "lib";
+
+   package Compiler is
+      for Switches ("ada") use ("-gnatVcdefimoprst", "-gnatw.M.a.b.c.d.f.g.h.i.j.k.l.n.o.p.q.r.s.t.u.v.w.x.zcdfghijklmopqrtuvwxyz", "-gnatyABCIOSabcdefhiklnoprstux");
+   end Compiler;
+
 end Linux_Gpio;
+
