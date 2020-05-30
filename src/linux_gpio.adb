@@ -124,8 +124,16 @@ package body Linux_GPIO is
       end if;
    end Monitor_Device_Event_Open;
 
---   procedure Monitor_Device_Event_Open (LDevName      : String;
---                                        FD            : out FD_Type) is
+
+--      Event_Request.Line_Offset         := LPin;
+--      Event_Request.Handle_Flags        := Linux_GPIO.GPIOHANDLE_REQUEST_NONE;
+--      Event_Request.Consumer_Label      := Interfaces.C.To_C ("Smartmeter pulse" & Ada.Characters.Latin_1.NUL & "              "); -- 31 characters long
+--      Linux_GPIO.Monitor_Device_Event_Open (LDev_Name, Event_Request, Interfaces.C.int (IOCTL_FD_Interrupt));
+--      Linux_GPIO.Monitor_Device_Request_Open (LDev_Name, Lines, Num_Lines, Flags, Handle_Data, Label_Pin, IOCTL_FD_LED);
+--      Linux_GPIO.Monitor_Device_Close (IOCTL_FD_Interrupt);
+--   procedure Monitor_Device_Event_Open (LDev_Name     : String;
+--                                        Pin           : Pin_Num;
+--                                       FD            : out FD_Type) is
 --      Ret             : Interfaces.Integer_32;
 --      LMode           : constant GNAT.OS_Lib.Mode := GNAT.OS_Lib.Text;
 --      Event_Request   : aliased GPIO_Event_Request;
@@ -208,17 +216,11 @@ package body Linux_GPIO is
       IOCTL_Data      : aliased GPIO_Handle_Data;
       Ret             : Interfaces.Integer_32;
    begin
-      Ada.Text_IO.Put_Line ("Copying ICTL data");
       IOCTL_Data.Values := data.Values;
-      Ada.Text_IO.Put_Line ("0 - " & IOCTL_Data.Values (0)'Image);
-      Ada.Text_IO.Put_Line ("1 - " & IOCTL_Data.Values (1)'Image);
-      Ada.Text_IO.Put_Line ("2 - " & IOCTL_Data.Values (2)'Image);
-      Ada.Text_IO.Put_Line ("Calling set pin IOCTL, size: " & Integer (IOCTL_Data'Size / 8)'Image & ", IOCTL: " & GPIOHANDLE_SET_LINE_VALUES_IOCTL (IOCTL_Data'Size / 8)'Image);
       ret := C_Ioctl (Interfaces.C.int (FD), GPIOHANDLE_SET_LINE_VALUES_IOCTL (IOCTL_Data'Size / 8), IOCTL_Data'Access);
-      Ada.Text_IO.Put_Line ("Ret: " & Ret'Image);
+
       if Ret < 0 then
          raise IOCTL_Exception with GNAT.Source_Info.Line'Img;
       end if;
-      Ada.Text_IO.Put_Line ("Finished ioctl");
    end Monitor_Set_Pins;
 end Linux_GPIO;

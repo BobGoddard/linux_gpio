@@ -27,7 +27,7 @@ package Linux_GPIO is
    GPIOHANDLE_REQUEST_OPEN_SOURCE : constant Interfaces.Unsigned_32 := Shift_Left (1, 4);
    GPIOHANDLES_MAX                : constant Interfaces.Unsigned_32 := 64;
 
-   subtype Pin_Nums           is Interfaces.Unsigned_32 range 0 .. 63;
+   subtype Pin_Num            is Interfaces.Unsigned_32 range 0 .. 63;
    subtype Flags_Type         is Interfaces.Unsigned_32 range 0 .. 63;
    subtype Lines_Type         is Interfaces.Unsigned_32 range 0 .. 63;
    subtype Line_Offset_Type   is Interfaces.Unsigned_32 range 0 .. 63;
@@ -74,7 +74,7 @@ package Linux_GPIO is
    pragma Convention (C, GPIO_Handle_Request);
 
    type GPIO_Event_Request is record
-      Line_Offset    :  Pin_Nums;
+      Line_Offset    :  Pin_Num;
       Handle_Flags   :  Handle_Flags_Type;
       Event_Flags    :  Event_Flags_Type;
       Consumer_Label :  Consumer_Type;
